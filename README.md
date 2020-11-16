@@ -17,6 +17,11 @@ _Part of the MERMAID Replugged project_
 ```
 COUCHDB_USER=admin
 COUCHDB_PASSWORD=password
+POSTGRES_DB=mermaid
+POSTGRES_PASS=postgres
+POSTGRES_USER=postgres
+POSTGRES_DBNAME=mermaid
+POSTGRES_MULTIPLE_EXTENSIONS=postgis,hstore,postgis_topology,postgis_raster,pgrouting
 ```
 
 ## Spin up local development
