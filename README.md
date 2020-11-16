@@ -5,6 +5,12 @@ Hackathon Mermaid ETL
 _Part of the MERMAID Replugged project_
 
 
+## Prerequisites
+
+- Docker (https://docs.docker.com/engine/install/)
+- docker-compose (https://docs.docker.com/compose/install/)
+
+
 
 ## Environment Variables
 
