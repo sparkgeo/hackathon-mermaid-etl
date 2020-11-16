@@ -14,6 +14,7 @@ _Part of the MERMAID Replugged project_
 
 ## Environment Variables
 
+Copy the following into a `.env` file (see `.env_sample`)
 ```
 COUCHDB_USER=admin
 COUCHDB_PASSWORD=password
