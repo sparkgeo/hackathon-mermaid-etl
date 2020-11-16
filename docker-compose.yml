@@ -1,0 +1,22 @@
+version: '2'
+
+services:
+
+    offline_db:
+        container_name: offline_db
+        image: couchdb:3.0
+        ports:
+            - 5984:5984
+        volumes:
+            - $PWD/couch_data:/opt/couchdb/data
+        env_file:
+            - .env
+    api_db:
+        container_name: online_db
+        image: kartoza/postgis:13.0
+        volumes:
+            - $PWD/pg_data:/var/lib/postgresql
+        env_file:
+            - .env
+        ports:
+            - 5432:5432
