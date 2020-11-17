@@ -1,0 +1,47 @@
+version: 0.1
+record_maps:
+  mermaid-site:
+    - 
+      source: _id
+      # This would be to track couch db in postgres
+      target: _source_id
+    - 
+      source: name
+      target: name
+    - 
+      source: location
+      source_type: geojson
+      target: location
+      target_type: geometry
+    - 
+      source: updated_by
+      target: updated_by
+    - 
+      source: project
+      target: project
+    - 
+      source: created_on
+      source_type: str
+      target: created_on
+      target_type: datetime.datetime
+    - 
+      source: updated_on
+      source_type: str
+      target: updated_on
+      target_type: datetime.datetime
+    - 
+      source: notes
+      target: notes
+    - 
+      source: country
+      target: country
+    - 
+      source: reef_type
+      target: reef_type
+    - 
+      source: reef_zone
+      target: reef_zone
+    - 
+      source: exposure
+      target: exposure
+  
