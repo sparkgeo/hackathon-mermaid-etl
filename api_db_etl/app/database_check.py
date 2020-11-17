@@ -1,0 +1,13 @@
+import asyncio
+
+from .database import db
+from . import settings
+
+if __name__ == "__main__":
+    loop = asyncio.get_event_loop()
+    try:
+        loop.run_until_complete(db.connect())
+    except Exception:
+        exit(1)
+    loop.run_until_complete(db.disconnect())
+    exit(0)

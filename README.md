@@ -22,6 +22,10 @@ POSTGRES_PASS=postgres
 POSTGRES_USER=postgres
 POSTGRES_DBNAME=mermaid
 POSTGRES_MULTIPLE_EXTENSIONS=postgis,hstore,postgis_topology,postgis_raster,pgrouting
+PGADMIN_DEFAULT_EMAIL=admin
+PGADMIN_DEFAULT_PASSWORD=admin
+PGADMIN_LISTEN_ADDRESS=api_db_pgadmin
+PGADMIN_LISTEN_PORT=5050
 ```
 
 ## Spin up local development
@@ -29,7 +33,7 @@ POSTGRES_MULTIPLE_EXTENSIONS=postgis,hstore,postgis_topology,postgis_raster,pgro
 
 Start CouchDB and PostgreSQL databases
 
-`make start_db`
+`make build && make start_db`
 
 Stop CouchDB and PostgreSQL databases
 
@@ -51,7 +55,13 @@ Access psql
 make psql
 
 ```
+or 
+```
+http://localhost:5050
 
+user/ admin
+password/ admin
+```
 
 
 
