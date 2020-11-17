@@ -4,3 +4,4 @@ psycopg2-binary==2.8.5
 asyncpg==0.20.1
 databases==0.2.6
 geoalchemy2==0.8.4
+CouchDB==1.2
