@@ -5,9 +5,10 @@ import sys
 from logging.config import fileConfig
 
 from alembic import context
-from sqlalchemy import engine_from_config, pool, MetaData
+from sqlalchemy import engine_from_config, pool
 
 from app.model import *
+from app.database import metadata
 from app.settings import POSTGRES_URL
 
 
@@ -41,7 +42,7 @@ def run_migrations_online() -> None:
     with connectable.connect() as connection:
         context.configure(
             connection=connection,
-            target_metadata=MetaData(),
+            target_metadata=metadata,
             include_object=include_object,
             process_revision_directives=process_revision_directives,
         )
