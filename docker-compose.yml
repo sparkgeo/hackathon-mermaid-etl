@@ -1,4 +1,11 @@
-version: '2'
+version: '3'
+
+networks:
+    mermaid-etl:
+        name: mermaid-etl
+
+volumes:
+    mermaid_etl_status_schema:
 
 services:
 
@@ -11,6 +18,8 @@ services:
             - $PWD/couch_data:/opt/couchdb/data
         env_file:
             - .env
+        networks:
+            - mermaid-etl
     api_db:
         container_name: online_db
         image: kartoza/postgis:13.0
@@ -20,3 +29,35 @@ services:
             - .env
         ports:
             - 5432:5432
+        networks:
+            - mermaid-etl
+    api_db_migration_monitor:
+        container_name: api_db_migration_monitor
+        build:
+            context: ./api_db_migration_monitor
+        depends_on:
+            - api_db
+        volumes:
+            - mermaid_etl_status_schema:/status/schema/
+    api_db_etl:
+        container_name: api_db_etl
+        build:
+            context: ./api_db_etl
+        depends_on:
+            - api_db
+        volumes:
+            - mermaid_etl_status_schema:/status/schema
+            - ./api_db_etl/app:/app
+        networks:
+            - mermaid-etl
+    api_db_pgadmin:
+        container_name: api_db_pgadmin
+        image: dpage/pgadmin4:4.25
+        depends_on:
+            - api_db
+        ports:
+            - 5050:5050
+        env_file: 
+            - .env
+        networks:
+            - mermaid-etl
