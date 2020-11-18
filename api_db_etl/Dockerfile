@@ -10,6 +10,8 @@ COPY app /app
 
 ENV PYTHONPATH ${PYTHONPATH}:/
 
+COPY gunicorn.conf.py /
+
 # depends on a volume mounted at /status/schema (managed by docker-compose)
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["tail", "-f", "/dev/null"]
+CMD ["gunicorn", "-c", "/gunicorn.conf.py", "app.main:app"]

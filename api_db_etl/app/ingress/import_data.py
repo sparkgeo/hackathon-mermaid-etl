@@ -16,7 +16,7 @@ INSERTS = {
     "site": insert_site
 }
 
-async def import_record(target_model: str, record_id: str):
+async def import_record_by_id(target_model: str, record_id: str):
     try:
         record = get_record_by_id(record_id)
     except Exception as e:
