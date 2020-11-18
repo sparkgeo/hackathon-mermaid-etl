@@ -15,6 +15,9 @@ start_db:
 stop_db:
 	docker-compose down
 
+kill_db:
+	docker-compose down -v
+
 fauxton:
 	open http://localhost:5984/_utils/
 	@echo "u/ admin"

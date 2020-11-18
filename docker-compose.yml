@@ -1,4 +1,4 @@
-version: '3'
+version: '3.7'
 
 networks:
     mermaid-etl:
@@ -6,6 +6,8 @@ networks:
 
 volumes:
     mermaid_etl_status_schema:
+    couch_data:
+    pg_data:
 
 services:
 
@@ -15,7 +17,7 @@ services:
         ports:
             - 5984:5984
         volumes:
-            - $PWD/couch_data:/opt/couchdb/data
+            - couch_data:/opt/couchdb/data
         env_file:
             - .env
         networks:
@@ -24,7 +26,7 @@ services:
         container_name: online_db
         image: kartoza/postgis:13.0
         volumes:
-            - $PWD/pg_data:/var/lib/postgresql
+            - pg_data:/var/lib/postgresql
         env_file:
             - .env
         ports:
