@@ -12,4 +12,4 @@ ENV PYTHONPATH ${PYTHONPATH}:/
 
 # depends on a volume mounted at /status/schema (managed by docker-compose)
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["python", "-m", "app.run"]
+CMD ["tail", "-f", "/dev/null"]

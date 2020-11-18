@@ -1,4 +1,3 @@
-from sqlalchemy import Table
 from uuid import UUID
 
 from ..database import db

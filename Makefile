@@ -31,3 +31,9 @@ psql:
 
 generate-migration:
 	docker-compose exec $(ETL_CONTAINER_NAME) alembic -c /app/migrations/alembic.ini revision --autogenerate
+
+new-migration:
+	docker-compose exec $(ETL_CONTAINER_NAME) alembic -c /app/migrations/alembic.ini revision
+
+apply-migration:
+	docker-compose exec $(ETL_CONTAINER_NAME) alembic -c /app/migrations/alembic.ini upgrade head

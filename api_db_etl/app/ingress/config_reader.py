@@ -1,3 +1,4 @@
+import os
 from dataclasses import dataclass, field
 import json
 from pathlib import Path
@@ -30,6 +31,6 @@ def load_etl_config(file_path: Union[Path, str]) -> ETLConfig:
 
 
 if __name__ == "__main__":
-    etl_config = load_etl_config("etl.yml")
+    etl_config = load_etl_config(os.path.join(os.path.dirname(__file__), "config.yml"))
     for field_map in etl_config.record_maps["mermaid-site"]:
         print(field_map.source)

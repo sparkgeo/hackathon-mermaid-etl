@@ -9,5 +9,11 @@ else:
     raise ValueError(f"Configured CouchDB name ({COUCHDB_DBNAME}) does not exist")
 
 def get_documents_since(since: str = "0"):
-    result = db.changes(since=since)
-    return result
+    return db.changes(since=since)
+
+
+def get_record_by_id(id: str):
+    if id in db:
+        return db[id]
+    else:
+        raise ValueError(f"Expected ID is not available: {id}")

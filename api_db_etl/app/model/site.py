@@ -13,6 +13,7 @@ site = Table(
     "site",
     metadata,
     Column("id", UUID, primary_key=True),
+    Column("_source_id", UUID, nullable=False),
     Column("created_on", DateTime(timezone=False), nullable=False, server_default=text("(now() at time zone 'utc')")),
     Column("updated_on", DateTime(timezone=False), nullable=False, server_default=text("(now() at time zone 'utc')")),
     Column("data", JSONB),
@@ -25,7 +26,7 @@ site = Table(
     Column("reef_type_id", UUID, nullable=False),
     Column("reef_zone_id", UUID, nullable=False),
     Column("updated_by_id", UUID, nullable=False),
-    Column("predecessor_id", UUID, nullable=False),
+    Column("predecessor_id", UUID),
     Column("validations", JSONB),
     Column("created_by_id", UUID, nullable=False),
 )
