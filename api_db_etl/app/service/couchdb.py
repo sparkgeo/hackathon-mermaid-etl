@@ -1,6 +1,6 @@
 import couchdb
 
-from ..settings import COUCHDB_URL, COUCHDB_DBNAME
+from app.settings import COUCHDB_URL, COUCHDB_DBNAME
 
 couchserver = couchdb.Server(COUCHDB_URL)
 if COUCHDB_DBNAME in couchserver:

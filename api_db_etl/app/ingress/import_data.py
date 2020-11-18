@@ -1,10 +1,14 @@
 import os
 
-from .config_reader import load_etl_config, FieldMap
-from .conversions.geojson_to_geometry import convert as geojson_to_geometry
-from .conversions.str_to_datetime import convert as str_to_datetime
-from ..service.couchdb import get_record_by_id
-from ..service.site import insert as insert_site
+from typing import List
+
+from app.ingress.config_reader import load_etl_config, FieldMap
+from app.ingress.conversions.geojson_to_geometry import convert as geojson_to_geometry
+from app.ingress.conversions.str_to_datetime import convert as str_to_datetime
+from app.ingress.validations.validation_error import ValidationError
+from app.ingress.validations.validation_error_type import ValidationErrorType
+from app.service.couchdb import get_record_by_id
+from app.service.site import insert as insert_site
 
 
 FIELD_MAPS_BY_TABLE = load_etl_config(os.path.join(os.path.dirname(__file__), "config.yml")).record_maps
@@ -16,16 +20,17 @@ INSERTS = {
     "site": insert_site
 }
 
-async def import_record_by_id(target_model: str, record_id: str):
+async def import_record_by_id(target_model: str, record_id: str, ignore_optional_errors: bool) -> List:
     try:
         record = get_record_by_id(record_id)
     except Exception as e:
         print(f"problem retrieving record {record_id}: {e}")
         return None
 
+    validation_errors = list()
     to_import = dict()
     for field_name, field_value in dict(record).items():
-        field_map = _get_field_map_for_field(target_model.name, field_name)
+        field_map = _get_field_map_from_source(target_model.name, field_name)
         target_value = None
         if field_map:
             if field_map.source_type and field_map.target_type:
@@ -46,9 +51,25 @@ async def import_record_by_id(target_model: str, record_id: str):
     if len(unknown_columns) > 0:
         raise ValueError(f"The following columns are mapped but unknown in the target model: {unknown_columns}")
 
-    await INSERTS[target_model.name](to_import)
+    db_constraint_detail = await INSERTS[target_model.name](to_import)
+    if db_constraint_detail:
+        validation_errors.append(ValidationError(
+            validation_error_type=ValidationErrorType.MANDATORY,
+            field_names=list(map(lambda column_name: _convert_target_field_name_to_source(target_model.name, column_name), db_constraint_detail.column_names)),
+            error=db_constraint_detail.description,
+        ))
+    
+    return validation_errors
 
 
-def _get_field_map_for_field(target_table: str, field_name: str) -> FieldMap:
-    candidates = list(filter(lambda field_map: field_map.source == field_name, FIELD_MAPS_BY_TABLE[f"mermaid-{target_table}"]))
+def _get_field_map_from_source(target_table: str, source_field_name: str) -> FieldMap:
+    candidates = list(filter(lambda field_map: field_map.source == source_field_name, FIELD_MAPS_BY_TABLE[f"mermaid-{target_table}"]))
     return candidates[0] if len(candidates) > 0 else None
+
+
+def _convert_target_field_name_to_source(target_table: str, target_field_name: str) -> str:
+    candidates = list(filter(lambda field_map: field_map.target == target_field_name, FIELD_MAPS_BY_TABLE[f"mermaid-{target_table}"]))
+    if len(candidates) == 1:
+        return candidates[0].source
+    else:
+        return target_field_name

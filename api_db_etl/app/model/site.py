@@ -22,7 +22,7 @@ site = Table(
     Column("notes", Text, nullable=False),
     Column("country_id", UUID, nullable=False),
     Column("exposure_id", UUID, nullable=False),
-    Column("project_id", UUID, ForeignKey("project.id"), nullable=False),
+    Column("project_id", UUID, ForeignKey("project.id", name="site_project_id_ref_constraint"), nullable=False),
     Column("reef_type_id", UUID, nullable=False),
     Column("reef_zone_id", UUID, nullable=False),
     Column("updated_by_id", UUID, nullable=False),

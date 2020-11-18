@@ -1,7 +1,7 @@
 from uuid import UUID
 
-from ..database import db
-from ..model.project import project
+from app.database import db
+from app.model.project import project
 
 
 async def get_by_id(id: UUID):
