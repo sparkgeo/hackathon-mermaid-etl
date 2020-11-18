@@ -31,6 +31,9 @@ fauxton:
 psql:
 	docker exec -it online_db /bin/bash -c "PGPASSWORD=${POSTGRES_PASS} psql -U postgres -h localhost mermaid"
 
+api:
+	open http://localhost:8080/docs
+
 generate-migration:
 	docker-compose exec $(ETL_CONTAINER_NAME) alembic -c /app/migrations/alembic.ini revision --autogenerate
 

@@ -15,8 +15,7 @@ _Part of the MERMAID Replugged project_
 ## Environment Variables
 
 ```
-COUCHDB_USER=admin
-COUCHDB_PASSWORD=password
+POSTGRES_HOST=api_db
 POSTGRES_DB=mermaid
 POSTGRES_PASS=postgres
 POSTGRES_USER=postgres
@@ -26,6 +25,9 @@ PGADMIN_DEFAULT_EMAIL=admin
 PGADMIN_DEFAULT_PASSWORD=admin
 PGADMIN_LISTEN_ADDRESS=api_db_pgadmin
 PGADMIN_LISTEN_PORT=5050
+COUCHDB_USER=admin
+COUCHDB_PASSWORD=password
+COUCHDB_URL=http://admin:password@offline_db:5984/
 ```
 
 ## Spin up local development
