@@ -4,8 +4,9 @@ from fastapi import FastAPI, HTTPException, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 
-from app.ingress.import_data import import_record_by_id
+from app.ingress.import_data import import_document_by_id
 from app.ingress.import_report import ImportReport
+from app.ingress.import_status import ImportStatus
 from app.ingress.validations.validation_error import ValidationError
 from app.ingress.validations.validation_error_type import ValidationErrorType
 from app.model.site import site
@@ -21,6 +22,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+IMPORT_STATUS_MAP = {
+    ImportStatus.FAILED: status.HTTP_422_UNPROCESSABLE_ENTITY,
+    ImportStatus.PARTIAL: status.HTTP_207_MULTI_STATUS,
+    ImportStatus.COMPLETE: status.HTTP_200_OK,
+}
+
 @app.on_event("startup")
 async def startup():
     await db.connect()
@@ -31,11 +38,10 @@ async def shutdown():
     await db.disconnect()
 
 
-@app.post("/site/import/{record_id}", response_model=ImportReport)
-async def import_site_record_by_id(record_id: str, response: Response, force: bool = False):
-    import_report = await import_record_by_id(site, record_id, force)
-    if not import_report.success:
-        response.status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+@app.post("/site/import/{document_id}", response_model=ImportReport)
+async def import_site_document_by_id(document_id: str, response: Response, force: bool = False):
+    import_report = await import_document_by_id(site, document_id, force)
+    response.status_code = IMPORT_STATUS_MAP[import_report.status]
     return import_report
 
 

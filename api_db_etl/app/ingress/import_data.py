@@ -6,9 +6,11 @@ from app.ingress.config_reader import load_etl_config, FieldMap
 from app.ingress.conversions.geojson_to_geometry import convert as geojson_to_geometry
 from app.ingress.conversions.str_to_datetime import convert as str_to_datetime
 from app.ingress.import_report import ImportReport
+from app.ingress.import_status import ImportStatus
 from app.ingress.validations.validation_error import ValidationError
 from app.ingress.validations.validation_error_type import ValidationErrorType
-from app.service.couchdb import get_record_by_id
+from app.service.couchdb import get_document_by_id, record_import_in_document
+from app.service.document_management_error import DocumentManagementError
 from app.service.site import upsert as upsert_site, validate as validate_site
 
 
@@ -24,14 +26,15 @@ UPSERTS = {
     "site": upsert_site
 }
 
-async def import_record_by_id(target_model: str, record_id: str, ignore_optional_errors: bool) -> ImportReport:
+async def import_document_by_id(target_model: str, document_id: str, ignore_optional_errors: bool) -> ImportReport:
     try:
-        record = get_record_by_id(record_id)
+        record = get_document_by_id(document_id)
     except Exception as e:
-        print(f"problem retrieving record {record_id}: {e}")
+        print(f"problem retrieving document {document_id}: {e}")
         return None
 
-    import_success = False
+    import_status = ImportStatus.FAILED
+    import_detail = ""
     validation_errors = list()
     to_import = dict()
     for field_name, field_value in dict(record).items():
@@ -75,11 +78,17 @@ async def import_record_by_id(target_model: str, record_id: str, ignore_optional
                 error=db_constraint_detail.description,
             ))
         else:
-            import_success = True
+            try:
+                record_import_in_document(record)
+                import_status = ImportStatus.COMPLETE
+            except DocumentManagementError as dme:
+                import_status = ImportStatus.PARTIAL
+                import_detail = dme.detail
     
     return ImportReport(
         validation_errors=validation_errors,
-        success=import_success,
+        status=import_status,
+        detail=import_detail,
     )
 
 
