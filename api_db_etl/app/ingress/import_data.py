@@ -5,10 +5,11 @@ from typing import List
 from app.ingress.config_reader import load_etl_config, FieldMap
 from app.ingress.conversions.geojson_to_geometry import convert as geojson_to_geometry
 from app.ingress.conversions.str_to_datetime import convert as str_to_datetime
+from app.ingress.import_report import ImportReport
 from app.ingress.validations.validation_error import ValidationError
 from app.ingress.validations.validation_error_type import ValidationErrorType
 from app.service.couchdb import get_record_by_id
-from app.service.site import insert as insert_site, validate as validate_site
+from app.service.site import upsert as upsert_site, validate as validate_site
 
 
 FIELD_MAPS_BY_TABLE = load_etl_config(os.path.join(os.path.dirname(__file__), "config.yml")).record_maps
@@ -19,17 +20,18 @@ FIELD_CONVERSIONS = {
 VALIDATIONS = {
     "site": validate_site
 }
-INSERTS = {
-    "site": insert_site
+UPSERTS = {
+    "site": upsert_site
 }
 
-async def import_record_by_id(target_model: str, record_id: str, ignore_optional_errors: bool) -> List:
+async def import_record_by_id(target_model: str, record_id: str, ignore_optional_errors: bool) -> ImportReport:
     try:
         record = get_record_by_id(record_id)
     except Exception as e:
         print(f"problem retrieving record {record_id}: {e}")
         return None
 
+    import_success = False
     validation_errors = list()
     to_import = dict()
     for field_name, field_value in dict(record).items():
@@ -58,23 +60,27 @@ async def import_record_by_id(target_model: str, record_id: str, ignore_optional
     validation_failures = list(filter(lambda validation_result: not validation_result.passed, validation_results))
     if len(validation_failures) > 0:
         for validation_failure in validation_failures:
-            valication_errors.append(ValidationError(
+            validation_errors.append(ValidationError(
                 validation_error_type=ValidationErrorType.OPTIONAL,
                 field_names=list(map(lambda column_name: _convert_target_field_name_to_source(target_model.name, column_name), validation_failure.column_names)),
                 error=validation_failure.description,
             ))
-        if not ignore_optional_errors:
-            return validation_errors
 
-    db_constraint_detail = await INSERTS[target_model.name](to_import)
-    if db_constraint_detail:
-        validation_errors.append(ValidationError(
-            validation_error_type=ValidationErrorType.MANDATORY,
-            field_names=list(map(lambda column_name: _convert_target_field_name_to_source(target_model.name, column_name), db_constraint_detail.column_names)),
-            error=db_constraint_detail.description,
-        ))
+    if len(validation_errors) == 0 or ignore_optional_errors:
+        db_constraint_detail = await UPSERTS[target_model.name](to_import)
+        if db_constraint_detail:
+            validation_errors.append(ValidationError(
+                validation_error_type=ValidationErrorType.MANDATORY,
+                field_names=list(map(lambda column_name: _convert_target_field_name_to_source(target_model.name, column_name), db_constraint_detail.column_names)),
+                error=db_constraint_detail.description,
+            ))
+        else:
+            import_success = True
     
-    return validation_errors
+    return ImportReport(
+        validation_errors=validation_errors,
+        success=import_success,
+    )
 
 
 def _get_field_map_from_source(target_table: str, source_field_name: str) -> FieldMap:

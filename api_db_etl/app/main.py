@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 
 from app.ingress.import_data import import_record_by_id
+from app.ingress.import_report import ImportReport
 from app.ingress.validations.validation_error import ValidationError
 from app.ingress.validations.validation_error_type import ValidationErrorType
 from app.model.site import site
@@ -30,14 +31,15 @@ async def shutdown():
     await db.disconnect()
 
 
-@app.post("/site/import/{record_id}", response_model=List[ValidationError])
+@app.post("/site/import/{record_id}", response_model=ImportReport)
 async def import_site_record_by_id(record_id: str, response: Response, force: bool = False):
-    validation_errors = await import_record_by_id(site, record_id, force)
-    if len(list(filter(lambda validation_error: validation_error.validation_error_type == ValidationErrorType.MANDATORY, validation_errors))) > 0:
+    import_report = await import_record_by_id(site, record_id, force)
+    if not import_report.success:
         response.status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
-    return validation_errors
+    return import_report
 
 
+# local debug
 if __name__ == "__main__":
     import sys
     import uvicorn
