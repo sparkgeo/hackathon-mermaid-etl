@@ -8,13 +8,16 @@ from app.ingress.conversions.str_to_datetime import convert as str_to_datetime
 from app.ingress.validations.validation_error import ValidationError
 from app.ingress.validations.validation_error_type import ValidationErrorType
 from app.service.couchdb import get_record_by_id
-from app.service.site import insert as insert_site
+from app.service.site import insert as insert_site, validate as validate_site
 
 
 FIELD_MAPS_BY_TABLE = load_etl_config(os.path.join(os.path.dirname(__file__), "config.yml")).record_maps
 FIELD_CONVERSIONS = {
     "geojson|geography": geojson_to_geometry,
     "str|datetime.datetime": str_to_datetime,
+}
+VALIDATIONS = {
+    "site": validate_site
 }
 INSERTS = {
     "site": insert_site
@@ -50,6 +53,18 @@ async def import_record_by_id(target_model: str, record_id: str, ignore_optional
     unknown_columns = columns_in_insert.difference(columns_in_model)
     if len(unknown_columns) > 0:
         raise ValueError(f"The following columns are mapped but unknown in the target model: {unknown_columns}")
+
+    validation_results = await VALIDATIONS[target_model.name](to_import)
+    validation_failures = list(filter(lambda validation_result: not validation_result.passed, validation_results))
+    if len(validation_failures) > 0:
+        for validation_failure in validation_failures:
+            valication_errors.append(ValidationError(
+                validation_error_type=ValidationErrorType.OPTIONAL,
+                field_names=list(map(lambda column_name: _convert_target_field_name_to_source(target_model.name, column_name), validation_failure.column_names)),
+                error=validation_failure.description,
+            ))
+        if not ignore_optional_errors:
+            return validation_errors
 
     db_constraint_detail = await INSERTS[target_model.name](to_import)
     if db_constraint_detail:

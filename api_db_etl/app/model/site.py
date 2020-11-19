@@ -13,7 +13,6 @@ site = Table(
     "site",
     metadata,
     Column("id", UUID, primary_key=True),
-    Column("_source_id", UUID, nullable=False),
     Column("created_on", DateTime(timezone=False), nullable=False, server_default=text("(now() at time zone 'utc')")),
     Column("updated_on", DateTime(timezone=False), nullable=False, server_default=text("(now() at time zone 'utc')")),
     Column("data", JSONB),

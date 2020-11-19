@@ -3,8 +3,7 @@ record_maps:
   mermaid-site:
     - 
       source: _id
-      # This would be to track couch db in postgres
-      target: _source_id
+      target: id
     - 
       source: name
       target: name
