@@ -5,6 +5,7 @@ from typing import List
 from app.ingress.config_reader import load_etl_config, FieldMap
 from app.ingress.conversions.geojson_to_geometry import convert as geojson_to_geometry
 from app.ingress.conversions.str_to_datetime import convert as str_to_datetime
+from app.ingress.exceptions.unknown_id_error import UnknownIdError
 from app.ingress.import_report import ImportReport
 from app.ingress.import_status import ImportStatus
 from app.ingress.validations.validation_error import ValidationError
@@ -29,9 +30,8 @@ UPSERTS = {
 async def import_document_by_id(target_model: str, document_id: str, ignore_optional_errors: bool) -> ImportReport:
     try:
         record = get_document_by_id(document_id)
-    except Exception as e:
-        print(f"problem retrieving document {document_id}: {e}")
-        return None
+    except ValueError as e:
+        raise UnknownIdError()
 
     import_status = ImportStatus.FAILED
     import_detail = ""

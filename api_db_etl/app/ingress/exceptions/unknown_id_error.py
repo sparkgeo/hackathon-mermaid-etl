@@ -1,0 +1,2 @@
+class UnknownIdError(Exception):
+    pass

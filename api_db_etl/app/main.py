@@ -7,6 +7,7 @@ from typing import List
 from app.ingress.import_data import import_document_by_id
 from app.ingress.import_report import ImportReport
 from app.ingress.import_status import ImportStatus
+from app.ingress.exceptions.unknown_id_error import UnknownIdError
 from app.ingress.validations.validation_error import ValidationError
 from app.ingress.validations.validation_error_type import ValidationErrorType
 from app.model.site import site
@@ -40,7 +41,10 @@ async def shutdown():
 
 @app.post("/site/import/{document_id}", response_model=ImportReport)
 async def import_site_document_by_id(document_id: str, response: Response, force: bool = False):
-    import_report = await import_document_by_id(site, document_id, force)
+    try:
+        import_report = await import_document_by_id(site, document_id, force)
+    except UnknownIdError:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Document ID '{document_id}' not recognised")
     response.status_code = IMPORT_STATUS_MAP[import_report.status]
     return import_report
 
