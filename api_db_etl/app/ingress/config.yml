@@ -1,0 +1,49 @@
+version: 0.1
+record_maps:
+  mermaid-site:
+    - 
+      source: _id
+      target: id
+    - 
+      source: name
+      target: name
+    - 
+      source: location
+      source_type: geojson
+      target: location
+      target_type: geography
+    - 
+      source: updated_by
+      target: updated_by_id
+    - 
+      source: created_by
+      target: created_by_id
+    - 
+      source: project
+      target: project_id
+    - 
+      source: created_on
+      source_type: str
+      target: created_on
+      target_type: datetime.datetime
+    - 
+      source: updated_on
+      source_type: str
+      target: updated_on
+      target_type: datetime.datetime
+    - 
+      source: notes
+      target: notes
+    - 
+      source: country
+      target: country_id
+    - 
+      source: reef_type
+      target: reef_type_id
+    - 
+      source: reef_zone
+      target: reef_zone_id
+    - 
+      source: exposure
+      target: exposure_id
+  

@@ -1,7 +1,6 @@
 import asyncio
 
-from .database import db
-from . import settings
+from app.database import db
 
 if __name__ == "__main__":
     loop = asyncio.get_event_loop()
