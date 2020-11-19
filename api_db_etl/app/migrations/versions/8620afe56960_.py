@@ -10,8 +10,8 @@ import geoalchemy2
 
 
 # revision identifiers, used by Alembic.
-revision = '8620afe56960'
-down_revision = 'd577f6443ce5'
+revision = "8620afe56960"
+down_revision = "d577f6443ce5"
 branch_labels = None
 depends_on = None
 

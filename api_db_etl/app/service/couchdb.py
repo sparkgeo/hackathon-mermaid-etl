@@ -24,5 +24,7 @@ def record_import_in_document(document: object) -> None:
         document_copy = deepcopy(document)
         document_copy["imported_on"] = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
         db.save(document_copy)
-    except couchdb.ResourceConflict as rce:
-        raise DocumentManagementError("The source document in couchdb changed during import. Import timestamp could not be set in document")
+    except couchdb.ResourceConflict:
+        raise DocumentManagementError(
+            "The source document in couchdb changed during import. Import timestamp could not be set in document"
+        )

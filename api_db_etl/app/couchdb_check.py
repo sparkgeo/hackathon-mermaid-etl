@@ -1,6 +1,6 @@
 import couchdb
 
-from app.settings import COUCHDB_URL, COUCHDB_DBNAME
+from app.settings import COUCHDB_URL
 
 if __name__ == "__main__":
     try:

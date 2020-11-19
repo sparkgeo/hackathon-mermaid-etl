@@ -10,17 +10,17 @@ import geoalchemy2
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = '51d96cc3b849'
-down_revision = 'a88d76167dc0'
+revision = "51d96cc3b849"
+down_revision = "a88d76167dc0"
 branch_labels = None
 depends_on = None
 
 
 def upgrade():
-    op.add_column('site', sa.Column('_source_id', postgresql.UUID(), nullable=False))
-    op.drop_index('idx_site_location', table_name='site')
+    op.add_column("site", sa.Column("_source_id", postgresql.UUID(), nullable=False))
+    op.drop_index("idx_site_location", table_name="site")
 
 
 def downgrade():
-    op.create_index('idx_site_location', 'site', ['location'], unique=False)
-    op.drop_column('site', '_source_id')
+    op.create_index("idx_site_location", "site", ["location"], unique=False)
+    op.drop_column("site", "_source_id")

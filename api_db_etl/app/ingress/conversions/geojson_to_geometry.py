@@ -3,6 +3,7 @@ from typing import Dict
 
 from geoalchemy2.functions import ST_GeomFromGeoJSON
 
+
 def convert(geojson_dict: Dict[str, object]):
     # should be converting to Geography, not Geometry, but geoalchemy does not provide ST_GeogFromGeoJSON
     # at least for point features, postgres seems happy to accept a Geometry in place of a Geography

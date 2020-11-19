@@ -11,8 +11,8 @@ from alembic_utils.pg_view import PGView
 
 
 # revision identifiers, used by Alembic.
-revision = 'b0ecefa97eda'
-down_revision = 'efe0a86d3526'
+revision = "b0ecefa97eda"
+down_revision = "efe0a86d3526"
 branch_labels = None
 depends_on = None
 
